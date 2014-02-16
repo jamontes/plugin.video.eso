@@ -1,3 +1,7 @@
+1.0.0
+- Force settings setup on first run.
+- First release ready for summit to official repo.
+- Added forum thread for official support.
 0.0.9
 - Prepared everything for public testing.
 - Code cleaning and refactoring.

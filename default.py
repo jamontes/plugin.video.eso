@@ -33,13 +33,29 @@ lutil.set_debug_mode(settings.getSetting("debug"))
 translation = settings.getLocalizedString
 root_dir = settings.getAddonInfo('path')
 lutil.set_fanart_file(root_dir)
+st_release = settings.getSetting('version')
+current_release = settings.getAddonInfo('version')
+update_settings = True
 
+# This is to make it sure that settings are correctly setup on every addon update or on first run.
+if not st_release:
+    lutil.log("eso Warning: First run. Update settings.")
+    settings.openSettings()
+    settings.setSetting('version', current_release)
+elif st_release != current_release:
+    lutil.log("eso Warning: updated release. Check for update settings.")
+    if update_settings:
+        settings.openSettings()
+    settings.setSetting('version', current_release)
+                
 # Gets the quality for videos from settings
 try:
-    quality = settings.getSetting("quality")
+    quality = int(settings.getSetting('quality'))
 except:
-    settings.openSettings()
-    quality = settings.getSetting("quality")
+    settings.setSetting('quality', '0')
+    quality = 0
+
+lutil.log('eso quality setup to "%s"' % ('SD', 'HD')[quality])
 
 root_url = 'http://www.eso.org'
 
@@ -160,7 +176,7 @@ def play_video(params):
 
     buffer_link = lutil.carga_web(params.get("url"))
     pattern_video_failover = '<span class="archive_dl_text"><a href="([^"]*?)"'
-    pattern_video = 'var %s = fix_protocol\("([^"]*?)"\)' % ('mobilefile', 'hdfile')[int(quality)]
+    pattern_video = 'var %s = fix_protocol\("([^"]*?)"\)' % ('mobilefile', 'hdfile')[quality]
     video_url = lutil.find_first(buffer_link, pattern_video)
     if video_url:
         try:
